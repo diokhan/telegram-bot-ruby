@@ -16,7 +16,7 @@ module Telegram
         uploadStickerFile createNewStickerSet addStickerToSet
         setStickerPositionInSet deleteStickerFromSet answerInlineQuery
         sendInvoice answerShippingQuery answerPreCheckoutQuery
-        sendGame setGameScore getGameHighScores
+        sendGame setGameScore getGameHighScores sendInvoice
       ).freeze
       REPLY_MARKUP_TYPES = [
         Telegram::Bot::Types::ReplyKeyboardMarkup,
@@ -67,8 +67,8 @@ module Telegram
         ENDPOINTS.include?(method_name) || super
       end
 
-      def call(endpoint, raw_params = {})
-        params = build_params(raw_params)
+      def call(endpoint, raw_params = {}, force = false)
+        params = force ? raw_params : build_params(raw_params)
         response = conn.post("/bot#{token}/#{endpoint}", params)
         if response.status == 200
           JSON.parse(response.body)
